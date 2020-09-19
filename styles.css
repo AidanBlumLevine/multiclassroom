@@ -4,6 +4,7 @@
 
 body{
     display: flex; /* establish flex container */
+    flex-wrap: wrap;
     justify-content: center; /* center flex items horizontally, in this case */
     align-items: center; /* center flex items vertically, in this case */
 }
@@ -19,4 +20,9 @@ body{
 
 .level-left.is-divider{
     flex-grow: 1;
+}
+
+pre{
+    max-width: 400px;
+    max-height: 400px;
 }

@@ -4,28 +4,39 @@ var SCOPE = 'https://www.googleapis.com/auth/classroom.courses.readonly '
     + 'https://www.googleapis.com/auth/classroom.coursework.students.readonly '
     + 'https://www.googleapis.com/auth/drive.readonly '
 var studentDocs = {};
-
+var assignment;
+var course;
 function CreateCourseButtons(courses) {
     courses.forEach((course) => {
         $('body').append(`<button class="course button is-link" data-id="` + course.id + `">` + course.name + `</button>`);
-        $('.course').click((e) => {
-            SetCourse($(e.target).data('id'));
-            $('.course').remove();
-        })
+    })
+    $('.course').unbind().click(function () {
+        SetCourse($(this).data('id'));
+        $('.course').remove();
     })
 }
 
 function CreateAssignmentButtons(courseWork) {
     courseWork.forEach((cw) => {
-        $('body').append(`<button class="work button is-link" data-folderid="` + cw.assignment.studentWorkFolder.id + `">` + cw.title + `</button>`);
-        $('.work').click((e) => {
-            SetAssignment($(e.target).data('folderid'));
-            $('.work').remove();
-        })
+        var id;
+        if ('assignment' in cw) {
+            id = cw.assignment.studentWorkFolder.id
+        } else {
+            id = cw.materials[0].driveFile.driveFile.id
+        }
+        $('body').append(`<button class="work button is-link" data-folderid="` + id + `">` + cw.title + `</button>`);
+    })
+    $('.work').unbind().click(function () {
+        SetAssignment($(this).data('folderid'));
+        $('.work').remove();
     })
 }
 
 function SetAssignment(id) {
+    if (assignment != undefined) {
+        return;
+    }
+    assignment = id;
     gapi.client.drive.files.list({
         q: "'" + id + "' in parents"
     }).then(function (response) {
@@ -35,7 +46,6 @@ function SetAssignment(id) {
                 fileId: file.id,
                 fields: '*' //fix later
             }).then(function (response) {
-                console.log(response)
                 studentDocs[file.id] = {
                     studentName: response.result.owners[0].displayName,
                     modifiedTime: response.result.modifiedTime,
@@ -46,7 +56,7 @@ function SetAssignment(id) {
                     fileId: file.id,
                     mimeType: 'text/plain',
                 }).then(function (response) {
-                    studentDocs[file.id].content = response.body
+                    studentDocs[file.id].content = response.body;
                 });
             });
         });
@@ -64,20 +74,22 @@ function UpdateVisual() {
         if ($('.student-doc[data-docid="' + key + '"]').length == 0) {
             var newDoc = $('.student-doc.template').clone()
             newDoc.removeClass('template')
-            newDoc.attr('data-docid',key)
+            newDoc.attr('data-docid', key)
             $('body').append(newDoc)
             newDoc.find('.name').text(studentDocs[key].studentName)
-            newDoc.find('img').attr('src',studentDocs[key].icon)
-            newDoc.find('a').attr('href',studentDocs[key].link)
+            newDoc.find('img').attr('src', studentDocs[key].icon)
+            newDoc.find('a').attr('href', studentDocs[key].link)
         }
         var doc = $('.student-doc[data-docid="' + key + '"]');
-        doc.find('.content').html(studentDocs[key].content.replace(/\n/g, '<br/>'))
-        doc.find('.mod-time').text(timeSince(studentDocs[key].modifiedTime))
+        if (studentDocs[key].content != undefined) {
+            doc.find('.content').html(studentDocs[key].content.replace(/(\r\n|\r|\n){2,}/g, '$1\n'))
+            doc.find('.mod-time').text(timeSince(studentDocs[key].modifiedTime))
+        }
     }
 }
 
 function UpdatePull() {
-    for (var key of Object.keys(studentDocs)) {
+    Object.keys(studentDocs).forEach((key) => {
         gapi.client.drive.files.export({
             fileId: key,
             mimeType: 'text/plain',
@@ -87,10 +99,15 @@ function UpdatePull() {
                 studentDocs[key].content = response.body
             }
         });
-    }
+    });
 }
 
 function SetCourse(id) {
+    if (course != undefined) {
+        return;
+    }
+    course = id;
+
     gapi.client.classroom.courses.courseWork.list({
         courseId: id
     }).then(function (response) {
