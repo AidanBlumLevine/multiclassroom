@@ -1,0 +1,22 @@
+.template{
+    display: none !important;
+}
+
+body{
+    display: flex; /* establish flex container */
+    justify-content: center; /* center flex items horizontally, in this case */
+    align-items: center; /* center flex items vertically, in this case */
+}
+
+.is-divider{
+    display: block;
+    position: relative;
+    border-top: .1rem solid #dbdbdb;
+    height: .1rem;
+    margin: .75rem 0;
+    text-align: right;
+}
+
+.level-left.is-divider{
+    flex-grow: 1;
+}
