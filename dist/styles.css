@@ -1,0 +1,114 @@
+.template{
+    display: none !important;
+}
+
+body{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.centered{
+    align-items: center;
+    justify-content: center;
+    display: flex; 
+    height: calc(100% - 60px);
+}
+
+.is-divider{
+    display: block;
+    position: relative;
+    border-top: .1rem solid #dbdbdb;
+    height: .1rem;
+    margin: .75rem 0;
+    text-align: right;
+}
+
+.header{
+    padding: .5rem
+}
+
+.level-left.is-divider{
+    flex-grow: 1;
+}
+
+.docs-parent{
+    flex-grow: 1;
+    margin: 1rem !important;
+    height: 100%;
+}
+
+.dark{
+    background: #4a4a4a !important;
+}
+.dark:hover{
+    background: #6f6f6f !important;
+}
+
+.content-wrapper{
+    position: relative;
+    flex-grow: 1;
+}
+
+.box.modal-content{
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: .75rem;
+    max-height: unset;
+    width: unset;
+    display: flex;
+    flex-direction: column;
+}
+
+.fill-absolute{
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.pre{
+    background-color: #f5f5f5;
+    color: #4a4a4a;
+    overflow-x: auto;
+    padding: .75rem 1rem;
+    white-space: pre;
+}
+.student-content{
+    height: 20rem;
+}
+
+pre{
+    max-height: 15rem;
+}
+
+.mb-n1{
+    margin-bottom: -.5rem;
+}
+
+.box.is-vertical{
+    flex-direction: column;
+}
+
+.course{
+    display: flex !important;
+    margin-bottom: .25rem;
+}
+
+.work{
+    display: flex !important;
+    margin-bottom: .25rem;
+}
+
+.column > .box{
+    height: 100%;
+}
+
+.fade{
+    opacity: 0.5;
+}

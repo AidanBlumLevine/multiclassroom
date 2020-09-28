@@ -1,0 +1,80 @@
+<head>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.0/css/bulma.min.css">
+    <title>multi classroom</title>
+</head>
+
+<body>
+    <div class="header level mb-0">
+        <div class="level-left">
+            <div class="level-item name has-text-weight-medium is-size-4 ml-3"></div>
+        </div>
+        <div class="level-right">
+            <input class="level-item input" type="text" placeholder="Search"></input>
+        </div>
+    </div>
+    <div class="centered">
+        <button class="grant-permissions button" hidden>Connect Google account</button>
+        <div class="work-outer box is-vertical">
+            <div class="is-size-5 has-text-weight-medium">Pick an assignment</div>
+        </div>
+        <div class="course-outer box is-vertical">
+            <div class="is-size-5 has-text-weight-medium">Pick a course</div>
+        </div>
+        <div class="docs-parent template">
+            <div class="docs-location columns is-multiline"></div>
+        </div>
+    </div>
+
+    <div class="modal doc-preview">
+        <div class="modal-background"></div>
+        <div class="box modal-content">
+            <div>
+                <span class="mr-3">
+                    <img src="">
+                </span>
+                <span class="name is-size-5 has-text-weight-medium"></span>
+            </div>            
+            <div class="level mb-1 mt-0">
+                <div class="level-left is-divider mr-2">
+                </div>
+                <div class="level-right mod-time">
+                </div>
+            </div>
+            <div class="content-wrapper">
+                <div class="pre content mb-1 fill-absolute"></div>
+            </div>
+            <a class="open" target="_blank">open file</a>
+            <button class="modal-close is-medium dark"></button>
+        </div>
+    </div>
+
+    <div class="student-doc column is-one-quarter template">
+        <div class="box">
+            <span class="mr-3">
+                <img src="">
+            </span>
+            <span class="name is-size-5 has-text-weight-medium"></span>
+            <div class="level mb-1 mt-0">
+                <div class="level-left is-divider mr-2">
+                </div>
+                <div class="level-right mod-time">
+                </div>
+            </div>
+            <div class="pre content student-content mb-1"></div>
+            <div class="level mb-n1">
+                <div class="level-left">
+                    <a class="open" target="_blank">open file</a>
+                </div>
+                <div class="level-right">
+                    <a class="preview">preview</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="https://apis.google.com/js/api.js" type="text/javascript"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="index.js"></script>
+</body>

@@ -11,7 +11,9 @@ var loadCount = 0;
 
 function CreateCourseButtons(courses) {
     courses.forEach((course) => {
-        $('body').append(`<button class="course button is-link" data-id="` + course.teacherFolder.id + `">` + course.name + `</button>`);
+        if (course.teacherFolder != null) {
+            $('body').append(`<button class="course button is-link" data-id="` + course.teacherFolder.id + `">` + course.name + `</button>`);
+        }
     })
     $('.course').unbind().click(function () {
         SetCourse($(this).data('id'));

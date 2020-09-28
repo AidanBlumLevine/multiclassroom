@@ -2,9 +2,9 @@ var express = require('express');
 var app = express();
 var http = require('http').createServer(app);
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/dist'));
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
+    res.sendFile(__dirname + '/dist/index.html');
 });
 
 http.listen(3000, () => {
