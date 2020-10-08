@@ -3,8 +3,8 @@ const Diff = require('diff');
 var GoogleAuth;
 var SCOPE_CHECK = 'https://www.googleapis.com/auth/classroom.courses.readonly'
 var SCOPE = 'https://www.googleapis.com/auth/classroom.courses.readonly '
-    + 'https://www.googleapis.com/auth/classroom.coursework.students.readonly '
-    + 'https://www.googleapis.com/auth/drive.readonly '
+    + 'https://www.googleapis.com/auth/classroom.coursework.students '
+    + 'https://www.googleapis.com/auth/drive '
 var studentDocs = {};
 var assignment;
 var course;
@@ -23,7 +23,6 @@ function CreateCourseButtons(courses) {
 
 function CreateAssignmentButtons(courseWork) {
     console.log("Coursework: ")
-    console.log(courseWork);
     courseWork.forEach((cw) => {
         var id;
         if ('assignment' in cw) {
@@ -31,25 +30,25 @@ function CreateAssignmentButtons(courseWork) {
         } else {
             id = cw.materials[0].driveFile.driveFile.id
         }
-        $('.work-outer').show().append(`<div class="work button is-primary" data-folderid="` + id + `">` + cw.title + `</div>`);
+        $('.work-outer').show().append(`<div class="work button is-primary" data-folderid="` + id + `" data-cwid="` + cw.id + `">` + cw.title + `</div>`);
     })
     $('.work').unbind().click(function () {
         $('.header').find('.name').text($('.header').find('.name').text() + ': ' + $(this).text())
-        SetAssignment($(this).data('folderid'));
+        SetAssignment($(this).data('folderid'), $(this).data('cwid'));
         $('.work-outer').remove();
     })
 }
 
-function SetAssignment(id) {
+function SetAssignment(folderId, courseWorkId) {
     if (assignment != undefined) {
         return;
     }
-    assignment = id;
+    assignment = courseWorkId;
     gapi.client.drive.files.list({
-        q: "'" + id + "' in parents"
+        q: "'" + folderId + "' in parents"
     }).then(function (response) {
         var studentFiles = response.result.files;
-        studentFiles.forEach(file => {
+        studentFiles.forEach((file, index) => {
             gapi.client.drive.files.get({
                 fileId: file.id,
                 fields: '*' //fix later
@@ -58,14 +57,14 @@ function SetAssignment(id) {
                     studentName: response.result.owners[0].displayName,
                     modifiedTime: response.result.modifiedTime,
                     icon: response.result.iconLink,
-                    link: response.result.webViewLink
+                    link: response.result.webViewLink,
                 }
-                gapi.client.drive.files.export({
-                    fileId: file.id,
-                    mimeType: 'text/plain',
-                }).then(function (response) {
-                    studentDocs[file.id].content = response.body;
-                });
+            });
+            gapi.client.drive.files.export({
+                fileId: file.id,
+                mimeType: 'text/plain',
+            }).then(function (response) {
+                studentDocs[file.id].content = response.body;
             });
         });
     })
@@ -107,6 +106,26 @@ function UpdateVisual() {
                 })
                 $('.doc-preview').find('.mod-time').text(timeSince(studentDocs[key].modifiedTime))
             })
+            newDoc.find('.make-comment').click(function () {
+                var clicked = $(this)
+                var comment = clicked.parent().parent().find('.grade').val()
+                if (comment == "") {
+                    return;
+                }
+                gapi.client.drive.comments.create({
+                    fileId: key,
+                    fields: "*",
+                    content: comment
+                }, {
+                    'content': comment
+                }
+                ).then(() => {
+                    clicked.parent().parent().find('.comment').removeClass('is-warning')
+                })
+            })
+            $('.comment').on('input', function (e) {
+                $(this).addClass('is-warning')
+            })
         }
         var doc = $('.student-doc[data-docid="' + key + '"]');
         if (studentDocs[key].content != undefined) {
@@ -145,7 +164,6 @@ function SetCourse(id) {
         return;
     }
     course = id;
-
     gapi.client.classroom.courses.courseWork.list({
         courseId: id
     }).then(function (response) {
@@ -212,6 +230,8 @@ function updateSigninStatus() {
     var user = GoogleAuth.currentUser.get();
     var isAuthorized = user.hasGrantedScopes(SCOPE_CHECK);
     if (isAuthorized) {
+        console.log("GoogleUser:")
+        console.log(gapi)
         $('.grant-permissions').hide();
         sendAuthorizedApiRequest();
     } else {
@@ -233,8 +253,7 @@ $('.modal-close').click(function () {
 $('.work-outer').hide();
 $('.course-outer').hide();
 
-
-$('input').on('input', function (e) {
+$('.search').on('input', function (e) {
     var text = $(this).val()
     $('.student-doc:visible').each(function () {
         console.log($(this).find('.name').text() + ", " + text)
